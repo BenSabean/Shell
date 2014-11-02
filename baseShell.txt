@@ -1,0 +1,16 @@
+Currently Implemented:
+  -Successfully runs programs in the /bin directory. 
+    (use "ls /bin" to see all runable programs)
+  -can pass argument(s) to programs in /bin directory.
+    (e.g. ls -l)
+  -implemented built-in function exit.
+  -created function stub for built-in function cd and shell recognizes it
+   as a built-in function. 
+
+TODO:
+  -Add /usr/bin as another path to search.
+  -create a more informative command prompt.
+  -clear screen at start-up of shell and display a welcome message.
+  -display a logout message.
+  -define built-in function cd.
+  -create built-in function help.
