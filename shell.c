@@ -9,12 +9,14 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/utsname.h>
 
 #define BUFFSIZE 512
 #define DEBUG false
 #define DELIMITERS " \t"
 #define SUCCESS 0
 #define FAILURE 1
+#define UNIVERSAL_ZERO { 0 }
 
 //struct for built-in shell functions
 struct builtin {
@@ -106,13 +108,24 @@ int main(int argc, char **argv) {
     int bfunc_size = (int) (sizeof(bfunc)/sizeof(bfunc[0]));
 
     //buffer is to hold user commands
-    char buffer[BUFFSIZE] = { 0 };  //zero every elerment of the buffer
+    struct utsname ubuffer;
+    char buffer[BUFFSIZE] = UNIVERSAL_ZERO;  //zero every elerment of the buffer
+    char cwd[BUFFSIZE] = UNIVERSAL_ZERO;
+    char username[BUFFSIZE] = UNIVERSAL_ZERO;
     char* path[] = {"/bin/", "/usr/bin/", 0};
+
+    uname(&ubuffer);
 
     while(1)
     {
         //print the prompt
-        printf("myShell&gt: ");
+        if(getlogin_r(username, BUFFSIZE) == 0 &&
+           getcwd(cwd, BUFFSIZE) != NULL) {
+            printf("%s@%s:~%s$ ", username, ubuffer.nodename, cwd);
+        }
+        else {
+            printf("myShell&gt: ");
+        }
 
         fgets(buffer, BUFFSIZE, stdin);
         if(!check_builtins(bfunc, buffer, bfunc_size)) {
