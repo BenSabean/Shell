@@ -6,10 +6,13 @@ Currently Implemented:
   -implemented built-in function exit.
   -created function stub for built-in function cd and shell recognizes it
    as a built-in function.
-  -Added /usr/bin/ as another path to search. 
+  -Added /usr/bin/ as another path to search.
+  -Added Username, Host name and current directory to command prompt. 
 
 TODO:
-  -create a more informative command prompt.
+  -Don't display redundant information on the current directory in the
+   command prompt.
+    (e.g. display everything after /osxxxxxx/ on newCS)
   -clear screen at start-up of shell and display a welcome message.
   -display a logout message.
   -define built-in function cd.
