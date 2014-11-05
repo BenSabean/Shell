@@ -5,12 +5,14 @@ Currently Implemented:
     (e.g. ls -l)
   -implemented built-in function exit.
   -created function stub for built-in function cd and shell recognizes it
-   as a built-in function. 
+   as a built-in function.
+  -Added /usr/bin/ as another path to search. 
 
 TODO:
-  -Add /usr/bin as another path to search.
   -create a more informative command prompt.
   -clear screen at start-up of shell and display a welcome message.
   -display a logout message.
   -define built-in function cd.
   -create built-in function help.
+  -listen for arrow keys to move around user's input.
+  -Allow programs to be run using ./<program_name>
