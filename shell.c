@@ -21,7 +21,7 @@
 //struct for built-in shell functions
 struct builtin {
     const char* label;
-    void (*op)(char*);  //function pointer to built-in's operation function
+    void (*op)(char**);  //function pointer to built-in's operation function
 };
 
 int countArgs(char* buffer) {
@@ -71,16 +71,19 @@ void parse(char* buffer, char** arguments) {
 
 bool check_builtins(struct builtin* bfunc, char* buffer, int bfunc_size) {
     //returns true if buffer contains a built-in function, false otherwise.
-    char arg[BUFFSIZE];
-    strcpy(arg, buffer);
+    int arg_num = countArgs(buffer);
+    char* arg[arg_num + 1];
+    char input[BUFFSIZE] = UNIVERSAL_ZERO;
     int i;
 
+    strcpy(input, buffer);
+    arg[arg_num] = NULL;
+    parse(input, arg);  //Note: parse tokenizes buffer passed to it.
+
     for(i = 0; i < bfunc_size; i++) {
-        //note: arg has a newline character on the end.
-        if(strlen(arg)== strlen((bfunc[i]).label)+1) {
-            arg[strlen((bfunc[i]).label)] = 0;   //truncate arg
-            if (strcmp((bfunc[i]).label, arg) == 0){
-                (bfunc[i]).op(buffer);
+        if(strlen(arg[0])== strlen((bfunc[i]).label)) {
+            if (strcmp((bfunc[i]).label, arg[0]) == 0){
+                (bfunc[i]).op(arg);
                 return true;
             }
         }
@@ -92,15 +95,12 @@ void close_shell() {
     exit(SUCCESS);
 }
 
-void cd(char* buffer) {
-    //incomplete
-    printf("cd not yet implemented.\n");
+void cd(char** arg) {
+    chdir(arg[1]);   //will always be index 1 as 0 contains "cd".
 }
 
 int main(int argc, char **argv) {
 
-    //bfunc[] is an array of built-in functions that MUST be
-    //ordered from longest to shortest in terms of it's label
     struct builtin bfunc[] = {
         {.label = "exit", .op = &close_shell},
         {.label = "cd", .op = &cd}

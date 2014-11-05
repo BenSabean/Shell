@@ -1,13 +1,12 @@
 Currently Implemented:
   -Successfully runs programs in the /bin directory. 
     (use "ls /bin" to see all runable programs)
-  -can pass argument(s) to programs in /bin directory.
+  -can pass argument(s) to programs.
     (e.g. ls -l)
   -implemented built-in function exit.
-  -created function stub for built-in function cd and shell recognizes it
-   as a built-in function.
   -Added /usr/bin/ as another path to search.
-  -Added Username, Host name and current directory to command prompt. 
+  -Added Username, Host name and current directory to command prompt.
+  -implemented built-in function cd. 
 
 TODO:
   -Don't display redundant information on the current directory in the
@@ -15,7 +14,7 @@ TODO:
     (e.g. display everything after /osxxxxxx/ on newCS)
   -clear screen at start-up of shell and display a welcome message.
   -display a logout message.
-  -define built-in function cd.
   -create built-in function help.
-  -listen for arrow keys to move around user's input.
+  -create built-in function history.
+  -listen for arrow keys (left and right) to move around user's input.
   -Allow programs to be run using ./<program_name>
