@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 
     //buffer is to hold user commands
     char buffer[BUFFSIZE] = { 0 };  //zero every elerment of the buffer
-    char* path = "/bin/";
+    char* path[] = {"/bin/", "/usr/bin/", 0};
 
     while(1)
     {
@@ -136,11 +136,17 @@ int main(int argc, char **argv) {
                 arguments[num_of_args] = NULL;
 
                 char prog[BUFFSIZE];
-                strcpy(prog, path);
+                char** path_p = path;
 
-                //Concancate the program name to path
-                strcat(prog, arguments[0]);
-                execv(prog, arguments);
+                while(*path_p) {
+                    strcpy(prog, *path_p);
+
+                    //Concancate the program name to path
+                    strcat(prog, arguments[0]);
+                    execv(prog, arguments);
+
+                    path_p++;   //program not found. Try another path
+                }
 
                 //Following will only run if execv fails
                 fprintf(stderr, "%s: Command not found.\n",arguments[0]);
