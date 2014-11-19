@@ -22,6 +22,3 @@ TODO:
   -create built-in function history.
   -listen for arrow keys (left and right) to move around user's input.
   -Allow programs to be run using ./<program_name>
-
-BUGS:
-  -typing "wc < input >" causes prompt to be repeatedly printed.

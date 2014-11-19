@@ -111,7 +111,7 @@ bool valid_file(char* filename) {
 
 //Returns false if there is an error in the syntax for redirction,
 //otherwise returns true, including if no redirection takes place.
-bool check_redirection(char** arguments) {
+void check_redirection(char** arguments) {
     char** arg = arguments;
 
     while(*arg) {
@@ -123,7 +123,7 @@ bool check_redirection(char** arguments) {
             }
             else {
                 fprintf(stderr, "Error: No file to redirect to.\n");
-                return false;
+                exit(FAILURE); //kill child proccess
             }
        }
 
@@ -136,17 +136,16 @@ bool check_redirection(char** arguments) {
                 }
                 else {
                     fprintf(stderr, "Error: %s does not exist.\n", *arg);
-                    exit(FAILURE);  //kill child process
+                    exit(FAILURE);
                 }
             }
             else {
                 fprintf(stderr, "Error: No file to redirect to.\n");
-                return false;
+                exit(FAILURE);
             }
         }
         arg++;
     }
-    return true;
 }
 
 int main(int argc, char **argv) {
@@ -197,7 +196,7 @@ int main(int argc, char **argv) {
 
                 //Requirement of execv
                 arguments[num_of_args] = NULL;
-                if(check_redirection(arguments)) {
+                check_redirection(arguments);
 
                     char prog[BUFFSIZE];
                     char** path_p = path;
@@ -215,7 +214,6 @@ int main(int argc, char **argv) {
                     //Following will only run if execv fails
                     fprintf(stderr, "%s: Command not found.\n",arguments[0]);
                     return FAILURE;
-                }
             }
         }
     }
