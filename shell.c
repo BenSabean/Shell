@@ -109,13 +109,11 @@ bool valid_file(char* filename) {
     return false;
 }
 
-//Returns false if there is an error in the syntax for redirction,
-//otherwise returns true, including if no redirection takes place.
 void check_redirection(char** arguments) {
     char** arg = arguments;
 
     while(*arg) {
-        //check for redirection os stdout.
+        //check for redirection of stdout.
         if(**arg == '>') {
             *arg = NULL;    arg++;
             if(*arg) {
@@ -148,7 +146,7 @@ void check_redirection(char** arguments) {
     }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 
     struct builtin bfunc[] = {
         {.label = "exit", .op = &close_shell},
@@ -191,29 +189,29 @@ int main(int argc, char **argv) {
                 //Child code
                 int num_of_args = countArgs(buffer);
                 //arguments to be passed to execv
-                char *arguments[num_of_args+1];
+                char* arguments[num_of_args+1];
                 parse(buffer, arguments);
 
                 //Requirement of execv
                 arguments[num_of_args] = NULL;
                 check_redirection(arguments);
 
-                    char prog[BUFFSIZE];
-                    char** path_p = path;
+                char prog[BUFFSIZE];
+                char** path_p = path;
 
-                    while(*path_p) {
-                        strcpy(prog, *path_p);
+                while(*path_p) {
+                    strcpy(prog, *path_p);
 
-                        //Concancate the program name to path
-                        strcat(prog, arguments[0]);
-                        execv(prog, arguments);
+                    //Concancate the program name to path
+                    strcat(prog, arguments[0]);
+                    execv(prog, arguments);
 
-                        path_p++;   //program not found. Try another path
-                    }
+                    path_p++;   //program not found. Try another path
+                }
 
-                    //Following will only run if execv fails
-                    fprintf(stderr, "%s: Command not found.\n",arguments[0]);
-                    return FAILURE;
+                //Following will only run if execv fails
+                fprintf(stderr, "%s: Command not found.\n",arguments[0]);
+                return FAILURE;
             }
         }
     }
