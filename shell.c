@@ -113,11 +113,23 @@ void check_redirection(char** arguments) {
     char** arg = arguments;
 
     while(*arg) {
-        //check for redirection of stdout.
-        if(**arg == '>') {
+        //check for redirection of stdout with append feature.
+        if(strcmp(*arg, ">>") == 0 ) {
             *arg = NULL;    arg++;
             if(*arg) {
-                freopen(*arg,"w",stdout);
+                freopen(*arg, "a", stdout);
+            }
+            else {
+                printf("Error: No file to redirect to.\n");
+                exit(FAILURE);
+            }
+        }
+
+        //check for redirection of stdout.
+        if(strcmp(*arg, ">") == 0) {
+            *arg = NULL;    arg++;
+            if(*arg) {
+                freopen(*arg, "w", stdout);
             }
             else {
                 fprintf(stderr, "Error: No file to redirect to.\n");
@@ -126,7 +138,7 @@ void check_redirection(char** arguments) {
        }
 
         //check for redirection of stdin.
-        if(**arg == '<') {
+        if(strcmp(*arg, "<") == 0) {
             *arg = NULL;    arg++;
             if(*arg) {
                 if(valid_file(*arg)) {

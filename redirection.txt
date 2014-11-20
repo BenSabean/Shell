@@ -11,6 +11,7 @@ Currently Implemented:
   -successfully redirects stdin of a new process using '<'
   -can redirect multiple streams with a single command.
     (e.g. wc < input > output)
+  -Can append redirected output to a file using ">>"
 
 TODO:
   -Don't display redundant information on the current directory in the
@@ -22,3 +23,4 @@ TODO:
   -create built-in function history.
   -listen for arrow keys (left and right) to move around user's input.
   -Allow programs to be run using ./<program_name>
+  -Allow the rediection of stderr using "2>".
