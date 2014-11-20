@@ -120,7 +120,7 @@ void check_redirection(char** arguments) {
                 freopen(*arg, "a", stdout);
             }
             else {
-                printf("Error: No file to redirect to.\n");
+                fprintf(stderr, "Error: No file to redirect to.\n");
                 exit(FAILURE);
             }
         }
