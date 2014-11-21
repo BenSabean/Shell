@@ -109,6 +109,25 @@ bool valid_file(char* filename) {
     return false;
 }
 
+bool valid_filename(char* filename) {
+    //a filename cannot contain characters used for redirection, piping,
+    //or ';', ':', '/' or be NULL.
+    char restricted_char[] = {'<', '>', '|', ';', ':', '/', 0};
+    char* ptr_rchar =  restricted_char;
+
+    while(*ptr_rchar) {
+        if(strrchr(filename, *ptr_rchar)) {
+            return false;
+        }
+        ptr_rchar++;
+    }
+    //check for NULL
+    if(*ptr_rchar == *filename) {
+        return false;
+    }
+    return true;
+}
+
 void check_redirection(char** arguments) {
     char** arg = arguments;
 
@@ -116,24 +135,24 @@ void check_redirection(char** arguments) {
         //check for redirection of stdout with append feature.
         if(strcmp(*arg, ">>") == 0 ) {
             *arg = NULL;    arg++;
-            if(*arg) {
+            if(*arg && valid_filename(*arg)) {
                 freopen(*arg, "a", stdout);
             }
             else {
-                fprintf(stderr, "Error: No file to redirect to.\n");
-                exit(FAILURE);
+                fprintf(stderr, "Error: Bad file descriptor.\n");
+                exit(FAILURE);    //kill child proccess.
             }
         }
 
         //check for redirection of stdout.
         if(strcmp(*arg, ">") == 0) {
             *arg = NULL;    arg++;
-            if(*arg) {
+            if(*arg && valid_filename(*arg)) {
                 freopen(*arg, "w", stdout);
             }
             else {
-                fprintf(stderr, "Error: No file to redirect to.\n");
-                exit(FAILURE); //kill child proccess
+                fprintf(stderr, "Error: Bad file descriptor.\n");
+                exit(FAILURE);
             }
        }
 

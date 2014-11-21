@@ -12,7 +12,9 @@ Currently Implemented:
   -can redirect multiple streams with a single command.
     (e.g. wc < input > output)
   -Can append redirected output to a file using ">>"
-
+  -put constraints on the names of files that can be created from redirection
+   of stdout to prevent the creation of filenames that are malicious to the 
+   shell.
 TODO:
   -Don't display redundant information on the current directory in the
    command prompt.
