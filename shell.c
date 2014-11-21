@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/utsname.h>
+#include <readline/history.h>
 
 #define BUFFSIZE 512
 #define DEBUG false
