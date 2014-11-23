@@ -223,6 +223,10 @@ int main(int argc, char** argv) {
                 char* arguments[num_of_args+1];
                 parse(buffer, arguments);
 
+                if(strcmp(arguments[0], "") == 0) {
+                    return(FAILURE);
+                }
+
                 //Requirement of execv
                 arguments[num_of_args] = NULL;
                 check_redirection(arguments);

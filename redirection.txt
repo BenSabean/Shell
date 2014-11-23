@@ -15,6 +15,7 @@ Currently Implemented:
   -put constraints on the names of files that can be created from redirection
    of stdout to prevent the creation of filenames that are malicious to the 
    shell.
+  -Ignores empty input string and reprints prompt.
 TODO:
   -Don't display redundant information on the current directory in the
    command prompt.
