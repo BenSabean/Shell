@@ -99,7 +99,85 @@ void cd(char** arg) {
     chdir(arg[1]);   //will always be index 1 as 0 contains "cd".
 }
 
-int main(int argc, char **argv) {
+bool valid_file(char* filename) {
+    FILE* fptr = fopen(filename, "r");
+    if (fptr != NULL)
+    {
+        fclose(fptr);
+        return true;
+    }
+    return false;
+}
+
+bool valid_filename(char* filename) {
+    //a filename cannot contain characters used for redirection, piping,
+    //or ';', ':', '/' or be NULL.
+    char restricted_char[] = {'<', '>', '|', ';', ':', '/', 0};
+    char* ptr_rchar =  restricted_char;
+
+    while(*ptr_rchar) {
+        if(strrchr(filename, *ptr_rchar)) {
+            return false;
+        }
+        ptr_rchar++;
+    }
+    //check for NULL
+    if(*ptr_rchar == *filename) {
+        return false;
+    }
+    return true;
+}
+
+void check_redirection(char** arguments) {
+    char** arg = arguments;
+
+    while(*arg) {
+        //check for redirection of stdout with append feature.
+        if(strcmp(*arg, ">>") == 0 ) {
+            *arg = NULL;    arg++;
+            if(*arg && valid_filename(*arg)) {
+                freopen(*arg, "a", stdout);
+            }
+            else {
+                fprintf(stderr, "Error: Bad file descriptor.\n");
+                exit(FAILURE);    //kill child proccess.
+            }
+        }
+
+        //check for redirection of stdout.
+        if(strcmp(*arg, ">") == 0) {
+            *arg = NULL;    arg++;
+            if(*arg && valid_filename(*arg)) {
+                freopen(*arg, "w", stdout);
+            }
+            else {
+                fprintf(stderr, "Error: Bad file descriptor.\n");
+                exit(FAILURE);
+            }
+       }
+
+        //check for redirection of stdin.
+        if(strcmp(*arg, "<") == 0) {
+            *arg = NULL;    arg++;
+            if(*arg) {
+                if(valid_file(*arg)) {
+                   freopen(*arg, "r", stdin);
+                }
+                else {
+                    fprintf(stderr, "Error: %s does not exist.\n", *arg);
+                    exit(FAILURE);
+                }
+            }
+            else {
+                fprintf(stderr, "Error: No file to redirect to.\n");
+                exit(FAILURE);
+            }
+        }
+        arg++;
+    }
+}
+
+int main(int argc, char** argv) {
 
     struct builtin bfunc[] = {
         {.label = "exit", .op = &close_shell},
@@ -142,11 +220,16 @@ int main(int argc, char **argv) {
                 //Child code
                 int num_of_args = countArgs(buffer);
                 //arguments to be passed to execv
-                char *arguments[num_of_args+1];
+                char* arguments[num_of_args+1];
                 parse(buffer, arguments);
+
+                if(strcmp(arguments[0], "") == 0) {
+                    return(FAILURE);
+                }
 
                 //Requirement of execv
                 arguments[num_of_args] = NULL;
+                check_redirection(arguments);
 
                 char prog[BUFFSIZE];
                 char** path_p = path;
