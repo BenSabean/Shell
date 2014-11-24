@@ -111,7 +111,7 @@ void cd(char** arg) {
 
 //        for(int n = 0; n<10 ; n++) 
 //         {
-      
+
 //         printf("History command  %d: %s\n", n, history[n]);
 //         }
 
@@ -180,9 +180,9 @@ void check_redirection(char** arguments) {
             *arg = NULL;    arg++;
             if(*arg) {
                 if(valid_file(*arg)) {
-                 freopen(*arg, "r", stdin);
-             }
-             else {
+                   freopen(*arg, "r", stdin);
+               }
+               else {
                 fprintf(stderr, "Error: %s does not exist.\n", *arg);
                 exit(FAILURE);
             }
@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
     {
         //print the prompt
         if(getlogin_r(username, BUFFSIZE) == 0 &&
-         getcwd(cwd, BUFFSIZE) != NULL) {
+           getcwd(cwd, BUFFSIZE) != NULL) {
             printf("%s@%s:~%s$ ", username, ubuffer.nodename, cwd);
     }
     else {
@@ -230,7 +230,7 @@ int main(int argc, char** argv) {
     fgets(buffer, BUFFSIZE, stdin);
     if (history_count < 11) {
         history[history_count++] = strdup(buffer);
-   } else {
+    } else {
         free( history[0] );
         for (unsigned index = 1; index < 11; index++) {
             history[index - 1] = history[index];
@@ -238,10 +238,15 @@ int main(int argc, char** argv) {
         history[11 - 1] = strdup(buffer);
     }
 
-      for (int n = 1; n < 11; n++) {
-                printf("History command  %d: %s\n", n, history[n]);
-                }
+    if (strcmp(buffer,"history\n") == 0)
+    {
+      for (int n = 1; n < 10; n++) {
+        printf("History command  %d: %s\n", n, history[n]);
+        
+    }
 
+
+}
     // if(strcmp(buffer,"") != 0)
     // {
     //     if((cmdHistory= strdup(buffer)) != NULL)
@@ -261,52 +266,52 @@ int main(int argc, char** argv) {
     //         cmdHisC=0;
     // }
 
-  
-
-
-                
 
 
 
 
 
-    if(!check_builtins(bfunc, buffer, bfunc_size)) {
-        int pid = fork();
-
-        if(pid < 0) {
-            fprintf(stderr, "Unable to fork new process.\n");
-        }
-        if(pid > 0) {
 
 
-   
+
+
+if(!check_builtins(bfunc, buffer, bfunc_size)) {
+    int pid = fork();
+
+    if(pid < 0) {
+        fprintf(stderr, "Unable to fork new process.\n");
+    }
+    if(pid > 0) {
+
+
+
 
 
                 //Parent code
-            wait(NULL);
-        }
-        if(pid == 0) {
+        wait(NULL);
+    }
+    if(pid == 0) {
 
 
                 //Child code
-            int num_of_args = countArgs(buffer);
+        int num_of_args = countArgs(buffer);
                 //arguments to be passed to execv
-            char* arguments[num_of_args+1];
-            parse(buffer, arguments);
+        char* arguments[num_of_args+1];
+        parse(buffer, arguments);
 
                 //Requirement of execv
-            arguments[num_of_args] = NULL;
-            check_redirection(arguments);
+        arguments[num_of_args] = NULL;
+        check_redirection(arguments);
 
-            char prog[BUFFSIZE];
-            char** path_p = path;
+        char prog[BUFFSIZE];
+        char** path_p = path;
 
-            while(*path_p) {
-                strcpy(prog, *path_p);
+        while(*path_p) {
+            strcpy(prog, *path_p);
 
                     //Concancate the program name to path
-                strcat(prog, arguments[0]);
-                execv(prog, arguments);
+            strcat(prog, arguments[0]);
+            execv(prog, arguments);
 
 
                     path_p++;   //program not found. Try another path
@@ -314,10 +319,14 @@ int main(int argc, char** argv) {
                 
 
                 //Following will only run if execv fails
+            if(strcmp(buffer,"history") == 0)
+                {}
+            else{
                 fprintf(stderr, "%s: Command not found.\n",arguments[0]);
-                return FAILURE;
             }
+            return FAILURE;
         }
     }
-    return SUCCESS;
+}
+return SUCCESS;
 }
