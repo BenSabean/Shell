@@ -195,6 +195,19 @@ void check_redirection(char** arguments) {
     arg++;
 }
 }
+void processDeleteCmd(char *secondCmd)
+{
+   if ( remove(secondCmd) < 0 )
+   {
+      printf("Unable to remove file\n");
+      return;
+   }
+   else
+   {
+	printf("File successfully deleted.\n");
+	return;
+   }
+}
 
 int main(int argc, char** argv) {
 
@@ -245,6 +258,16 @@ int main(int argc, char** argv) {
         
     }
 }
+
+int numArgs = countArgs(buffer);
+	char* args[numArgs+1];
+        parse(buffer, args);
+	args[numArgs] = NULL;
+	if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
+   		{
+     		 	processDeleteCmd(args[1]);
+   		}
+
 
 
 
@@ -305,6 +328,9 @@ if(!check_builtins(bfunc, buffer, bfunc_size)) {
                 //Following will only run if execv fails
             if(strcmp(buffer,"history") == 0)
                 {}
+            //Make sure it skips the command not found
+             else if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
+		    {}
             else{
                 fprintf(stderr, "%s: Command not found.\n",arguments[0]);
             }
