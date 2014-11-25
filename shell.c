@@ -244,34 +244,7 @@ int main(int argc, char** argv) {
         printf("History command  %d: %s\n", n, history[n]);
         
     }
-
-
 }
-    // if(strcmp(buffer,"") != 0)
-    // {
-    //     if((cmdHistory= strdup(buffer)) != NULL)
-    //     {
-    //           if (cmdsHistory[cmdHisC]) {
-    //          free(cmdsHistory[cmdHisC]);
-    //           cmdsHistory[cmdHisC] = cmdHistory;
-    // }
-
-    //         cmdsHistory[cmdHisC] = cmdHistory;
-    //         cmdHisC++;
-    //     }       
-    //     else
-    //         fprintf(stderr, "Error, Cannot save this command in the history pointer: Out of memory\n");
-
-    //     if(cmdHisC>9)
-    //         cmdHisC=0;
-    // }
-
-
-
-
-
-
-
 
 
 
@@ -282,22 +255,33 @@ if(!check_builtins(bfunc, buffer, bfunc_size)) {
         fprintf(stderr, "Unable to fork new process.\n");
     }
     if(pid > 0) {
-
-
-
-
-
                 //Parent code
         wait(NULL);
     }
     if(pid == 0) {
-
 
                 //Child code
         int num_of_args = countArgs(buffer);
                 //arguments to be passed to execv
         char* arguments[num_of_args+1];
         parse(buffer, arguments);
+
+        if (strcmp(buffer,"starwars") == 0)
+    {
+        char* argumentsNew[3];
+      argumentsNew[0] = "/usr/bin/telnet";
+      argumentsNew[1] = "towel.blinkenlights.nl";
+      argumentsNew[2] = NULL;
+    //  char prog[BUFFSIZE];
+    //  strcpy(prog, *path_p);
+
+                    //Concancate the program name to path
+    //  strcat(prog, argumentsNew[0]);
+      execv(argumentsNew[0], argumentsNew);
+        
+    }
+
+        
 
                 //Requirement of execv
         arguments[num_of_args] = NULL;
