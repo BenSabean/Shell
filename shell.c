@@ -192,6 +192,27 @@ void check_redirection(char** arguments) {
         arg++;
     }
 
+void cowsay(char** arguments)
+{	//pointer to the arguments
+	char** args = arguments;
+	char* cow[] = {"     \\   ^__^                 ",                
+               "      \\  (OO)\\__________    ",
+               "         (__)\\          )\\/\\",
+               "              | |SHELL| |  ",
+               "              | | ers | |   "};
+	//to count number of characters
+	int numberOfChars = 0;
+	//counts number of arguments 
+	int numArgs = 0;
+	int i;
+	while(*args)
+	{   
+	    numberOfChars = strlen(*args) + numberOfChars;
+	    args++;
+	    numArgs++;
+	}
+       	numberOfChars = numberOfChars-3;
+}
 
 
 
@@ -230,14 +251,7 @@ int main(int argc, char** argv) {
     }
 }
 
-void cowsay(char** arguments)
-{
-	char* cow[] = {"     \\   ^__^                 ",                
-               "      \\  (OO)\\__________    ",
-               "         (__)\\          )\\/\\",
-               "              | |SHELL| |  ",
-               "              | | ers | |   "};
-}
+
 int numArgs = countArgs(buffer);
 	char* args[numArgs+1];
         parse(buffer, args);
