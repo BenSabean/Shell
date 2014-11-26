@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,11 +21,6 @@
 static const char *history[11];
 static  unsigned history_count = 0;
 
-
-typedef int boolean;
-#define true 1
-#define false 0
-
 //struct for built-in shell functions
 struct builtin {
     const char* label;
@@ -40,8 +36,8 @@ int countArgs(char* buffer) {
     do switch(*args) {
         case '\0':
         case ' ': case '\t':
-        if(inword) { inword = false; word_count++; }
-        break;
+           if(inword) { inword = false; word_count++; }
+           break;
         default: inword = true;
     } while(*args++);
 
@@ -61,15 +57,15 @@ void parse(char* buffer, char** arguments) {
 
     while (parsed != NULL) {
         ch = strrchr(parsed,'\n');  //Find last occurance of newline.
-        if(ch) {
+         if(ch) {
             *ch = 0;  //Remove newline character
         }
         arguments[i] = parsed;
 
 #if DEBUG
-        printf("parse: parsed pointer: *%s*\n", parsed);
-        printf("parse: Contents of arguments at index %d\n",i);
-        puts(arguments[i]);
+    printf("parse: parsed pointer: *%s*\n", parsed);
+    printf("parse: Contents of arguments at index %d\n",i);
+    puts(arguments[i]);
 #endif
         i++;
         parsed = strtok(NULL, DELIMITERS);  //Increment to next word
@@ -105,18 +101,6 @@ void close_shell() {
 void cd(char** arg) {
     chdir(arg[1]);   //will always be index 1 as 0 contains "cd".
 }
-
-// void printHistory (char ** history [])
-// {
-
-//        for(int n = 0; n<10 ; n++) 
-//         {
-
-//         printf("History command  %d: %s\n", n, history[n]);
-//         }
-
-// }
-
 
 bool valid_file(char* filename) {
     FILE* fptr = fopen(filename, "r");
@@ -173,7 +157,7 @@ void check_redirection(char** arguments) {
                 fprintf(stderr, "Error: Bad file descriptor.\n");
                 exit(FAILURE);
             }
-        }
+       }
 
         //check for redirection of stdin.
         if(strcmp(*arg, "<") == 0) {
@@ -181,19 +165,19 @@ void check_redirection(char** arguments) {
             if(*arg) {
                 if(valid_file(*arg)) {
                    freopen(*arg, "r", stdin);
-               }
-               else {
-                fprintf(stderr, "Error: %s does not exist.\n", *arg);
+                }
+                else {
+                    fprintf(stderr, "Error: %s does not exist.\n", *arg);
+                    exit(FAILURE);
+                }
+            }
+            else {
+                fprintf(stderr, "Error: No file to redirect to.\n");
                 exit(FAILURE);
             }
         }
-        else {
-            fprintf(stderr, "Error: No file to redirect to.\n");
-            exit(FAILURE);
-        }
+        arg++;
     }
-    arg++;
-}
 }
 
 int main(int argc, char** argv) {
@@ -201,7 +185,6 @@ int main(int argc, char** argv) {
     struct builtin bfunc[] = {
         {.label = "exit", .op = &close_shell},
         {.label = "cd", .op = &cd}
-       // {.label = "history", .op = &printHistory}
     };
     int bfunc_size = (int) (sizeof(bfunc)/sizeof(bfunc[0]));
 
@@ -214,51 +197,29 @@ int main(int argc, char** argv) {
 
     uname(&ubuffer);
 
-
-
     while(1)
     {
         //print the prompt
         if(getlogin_r(username, BUFFSIZE) == 0 &&
            getcwd(cwd, BUFFSIZE) != NULL) {
             printf("%s@%s:~%s$ ", username, ubuffer.nodename, cwd);
-    }
-    else {
-        printf("myShell&gt: ");
-    }
-
-    fgets(buffer, BUFFSIZE, stdin);
-    if (history_count < 11) {
-        history[history_count++] = strdup(buffer);
-    } else {
-        free( history[0] );
-        for (unsigned index = 1; index < 11; index++) {
-            history[index - 1] = history[index];
         }
-        history[11 - 1] = strdup(buffer);
-    }
+        else {
+            printf("myShell&gt: ");
+        }
 
-    if (strcmp(buffer,"history\n") == 0)
-    {
-      for (int n = 1; n < 10; n++) {
-        printf("History command  %d: %s\n", n, history[n]);
-        
-    }
-}
+        fgets(buffer, BUFFSIZE, stdin);
+        if(!check_builtins(bfunc, buffer, bfunc_size)) {
+            int pid = fork();
 
-
-
-if(!check_builtins(bfunc, buffer, bfunc_size)) {
-    int pid = fork();
-
-    if(pid < 0) {
-        fprintf(stderr, "Unable to fork new process.\n");
-    }
-    if(pid > 0) {
+            if(pid < 0) {
+                fprintf(stderr, "Unable to fork new process.\n");
+            }
+            if(pid > 0) {
                 //Parent code
-        wait(NULL);
-    }
-    if(pid == 0) {
+                wait(NULL);
+            }
+            if(pid == 0) {
 
                 //Child code
         int num_of_args = countArgs(buffer);
@@ -281,26 +242,22 @@ if(!check_builtins(bfunc, buffer, bfunc_size)) {
         
     }
 
-        
-
                 //Requirement of execv
-        arguments[num_of_args] = NULL;
-        check_redirection(arguments);
+                arguments[num_of_args] = NULL;
+                check_redirection(arguments);
 
-        char prog[BUFFSIZE];
-        char** path_p = path;
+                char prog[BUFFSIZE];
+                char** path_p = path;
 
-        while(*path_p) {
-            strcpy(prog, *path_p);
+                while(*path_p) {
+                    strcpy(prog, *path_p);
 
                     //Concancate the program name to path
-            strcat(prog, arguments[0]);
-            execv(prog, arguments);
-
+                    strcat(prog, arguments[0]);
+                    execv(prog, arguments);
 
                     path_p++;   //program not found. Try another path
                 }
-                
 
                 //Following will only run if execv fails
             if(strcmp(buffer,"history") == 0)
@@ -314,3 +271,4 @@ if(!check_builtins(bfunc, buffer, bfunc_size)) {
 }
 return SUCCESS;
 }
+
