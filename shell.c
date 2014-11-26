@@ -1,3 +1,6 @@
+/*
+	Based on code from http://dumbified.wordpress.com/2010/04/25/how-to-write-a-shell-in-c-using-fork-and-execv/
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +10,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/utsname.h>
+#include <readline/history.h>
 
 #define BUFFSIZE 512
 #define DEBUG false
@@ -20,7 +24,6 @@
 
 static const char *history[11];
 static  unsigned history_count = 0;
-
 //struct for built-in shell functions
 struct builtin {
     const char* label;
@@ -131,20 +134,6 @@ bool valid_filename(char* filename) {
     return true;
 }
 
-void processDeleteCmd(char *secondCmd)
-{
-   if ( remove(secondCmd) < 0 )
-   {
-      printf("Unable to remove file\n");
-      return;
-   }
-   else
-   {
-    printf("File successfully deleted.\n");
-    return;
-   }
-}
-
 void check_redirection(char** arguments) {
     char** arg = arguments;
 
@@ -192,49 +181,6 @@ void check_redirection(char** arguments) {
         }
         arg++;
     }
-}
-
-void cowsay(char** arguments)
-{	//pointer to the arguments
-	char** args = arguments;
-	char* cow[] = {"     \\   ^__^                 ",                
-               "      \\  (OO)\\__________    ",
-               "         (__)\\          )\\/\\",
-               "              | |SHELL| |  ",
-               "              | | ers | |   "};
-	//to count number of characters
-	int numberOfChars = 0;
-	//counts number of arguments 
-	int numArgs = 0;
-	int i;
-	while(*args)
-	{   
-	    numberOfChars = strlen(*args) + numberOfChars;
-	    args++;
-	    numArgs++;
-	}
-       	numberOfChars = numberOfChars-3;
-       	args = arguments;
-	for(i = 0; i < numberOfChars + 4; i++)
-	{
-		printf("_");
-	}
-	printf("\n<  ");
-	for(i = 1; i < numArgs; i++)
-	{
-		printf("%s ", args[i]);
-	}
-	printf("  >\n");
-	for(i = 0; i < numberOfChars + 4; i++)
-	{
-		printf("_");
-	}
-	printf("\n");
-	for(i = 0; i<5; i++)
-	{
-		printf("%s\n", cow[i]);
-	}
-	return;
 }
 
 void run_pipe(char* arg[]) {
@@ -286,6 +232,7 @@ int main(int argc, char** argv) {
 
     //buffer is to hold user commands
     struct utsname ubuffer;
+    unsigned index;
     char buffer[BUFFSIZE] = UNIVERSAL_ZERO;  //zero every elerment of the buffer
     char cwd[BUFFSIZE] = UNIVERSAL_ZERO;
     char username[BUFFSIZE] = UNIVERSAL_ZERO;
@@ -303,41 +250,26 @@ int main(int argc, char** argv) {
         else {
             printf("myShell&gt: ");
         }
-  fgets(buffer, BUFFSIZE, stdin);
-    if (history_count < 11) {
-        history[history_count++] = strdup(buffer);
-    } else {
-        free( history[0] );
-	unsigned index = 1;
-        for (; index < 11; index++) {
-            history[index - 1] = history[index];
+
+        fgets(buffer, BUFFSIZE, stdin);
+        if (history_count < 11) {
+            history[history_count++] = strdup(buffer);
         }
-        history[11 - 1] = strdup(buffer);
-    }
+        else {
+            free( history[0] );
+            for (index = 1; index < 11; index++) {
+                history[index - 1] = history[index];
+                history[11 - 1] = strdup(buffer);
+            }
+        }
 
-    if (strcmp(buffer,"history\n") == 0)
-    {
-	int n;
-      for (n = 1; n < 10; n++) {
-        printf("History command  %d: %s\n", n, history[n]);
-        
-    }
-}
+        if(strcmp(buffer, "history\n") == 0) {
+            int n;
+            for (n = 1; n < 10; n++) {
+                printf("History command  %d: %s\n", n, history[n]);
+            }
+        }
 
-
-int numArgs = countArgs(buffer);
-	char* args[numArgs+1];
-        parse(buffer, args);
-	args[numArgs] = NULL;
-	if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
-   		{
-     		 	processDeleteCmd(args[1]);
-   		}
-   	else if ( strcmp(args[0], "holycow") == 0)
-	{
-		cowsay(args);
-	}
-        
 
         if(!check_builtins(bfunc, buffer, bfunc_size)) {
             int pid = fork();
@@ -350,27 +282,25 @@ int numArgs = countArgs(buffer);
                 wait(NULL);
             }
             if(pid == 0) {
-
                 //Child code
-        int num_of_args = countArgs(buffer);
+                int num_of_args = countArgs(buffer);
                 //arguments to be passed to execv
-        char* arguments[num_of_args+1];
-        parse(buffer, arguments);
+                char* arguments[num_of_args+1];
+                parse(buffer, arguments);
 
-        if (strcmp(buffer,"starwars") == 0)
-    {
-        char* argumentsNew[3];
-      argumentsNew[0] = "/usr/bin/telnet";
-      argumentsNew[1] = "towel.blinkenlights.nl";
-      argumentsNew[2] = NULL;
-    //  char prog[BUFFSIZE];
-    //  strcpy(prog, *path_p);
+                if (strcmp(buffer,"starwars") == 0)
+                {
+                    char* argumentsNew[3];
+                    argumentsNew[0] = "/usr/bin/telnet";
+                    argumentsNew[1] = "towel.blinkenlights.nl";
+                    argumentsNew[2] = NULL;
 
-                    //Concancate the program name to path
-    //  strcat(prog, argumentsNew[0]);
-      execv(argumentsNew[0], argumentsNew);
-        
-    }
+                    execv(argumentsNew[0], argumentsNew);
+                }
+
+                if(strcmp(arguments[0], "") == 0) {
+                    return(FAILURE);
+                }
 
                 //Requirement of execv
                 arguments[num_of_args] = NULL;
@@ -390,21 +320,15 @@ int numArgs = countArgs(buffer);
                     path_p++;   //program not found. Try another path
                 }
 
-                //Following will only run if execv fails
-            if(strcmp(buffer,"history") == 0)
+                if(strcmp(arguments[0], "history") == 0)
                 {}
-            //Make sure it skips the command not found
-             else if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
-		    {}
-	     else if ( strcmp(args[0], "holycow") == 0 )
-		{}
-            else{
-                fprintf(stderr, "%s: Command not found.\n",arguments[0]);
+                else {
+                    //Following will only run if execv fails
+                    fprintf(stderr, "%s: Command not found.\n",arguments[0]);
+                }
+               return FAILURE;
             }
-            return FAILURE;
         }
     }
+    return SUCCESS;
 }
-return SUCCESS;
-}
-
