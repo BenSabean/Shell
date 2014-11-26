@@ -230,6 +230,14 @@ int main(int argc, char** argv) {
     }
 }
 
+void cowsay(char** arguments)
+{
+	char* cow[] = {"     \\   ^__^                 ",                
+               "      \\  (OO)\\__________    ",
+               "         (__)\\          )\\/\\",
+               "              | |SHELL| |  ",
+               "              | | ers | |   "};
+}
 int numArgs = countArgs(buffer);
 	char* args[numArgs+1];
         parse(buffer, args);
