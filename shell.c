@@ -292,6 +292,7 @@ int main(int argc, char** argv) {
     struct utsname ubuffer;
     unsigned index;
     char buffer[BUFFSIZE] = UNIVERSAL_ZERO;  //zero every elerment of the buffer
+    char bufferTwo[BUFFSIZE] = UNIVERSAL_ZERO;
     char cwd[BUFFSIZE] = UNIVERSAL_ZERO;
     char username[BUFFSIZE] = UNIVERSAL_ZERO;
     char* path[] = {"/bin/", "/usr/bin/", 0};
@@ -330,7 +331,8 @@ int main(int argc, char** argv) {
         
         int numArgs = countArgs(buffer);
 	char* args[numArgs+1];
-        parse(buffer, args);
+	strncpy(bufferTwo, buffer,BUFFSIZE);
+        parse(bufferTwo, args);
 	args[numArgs] = NULL;
 	if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
    		{
