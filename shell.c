@@ -212,6 +212,27 @@ void cowsay(char** arguments)
 	    numArgs++;
 	}
        	numberOfChars = numberOfChars-3;
+       	args = arguments;
+	for(i = 0; i < numberOfChars + 4; i++)
+	{
+		printf("_");
+	}
+	printf("\n<  ");
+	for(i = 1; i < numArgs; i++)
+	{
+		printf("%s ", args[i]);
+	}
+	printf("  >\n");
+	for(i = 0; i < numberOfChars + 4; i++)
+	{
+		printf("_");
+	}
+	printf("\n");
+	for(i = 0; i<5; i++)
+	{
+		printf("%s\n", cow[i]);
+	}
+	return;
 }
 
 
