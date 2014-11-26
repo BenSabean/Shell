@@ -1,6 +1,3 @@
-/*
-	Based on code from http://dumbified.wordpress.com/2010/04/25/how-to-write-a-shell-in-c-using-fork-and-execv/
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +14,12 @@
 #define SUCCESS 0
 #define FAILURE 1
 #define UNIVERSAL_ZERO { 0 }
+#define MAX_LENGTH 50
+#define ARG_LENGTH 50
+#define HISTORY_SIZE 100
+
+static const char *history[11];
+static  unsigned history_count = 0;
 
 //struct for built-in shell functions
 struct builtin {
@@ -217,15 +220,27 @@ int main(int argc, char** argv) {
                 wait(NULL);
             }
             if(pid == 0) {
-                //Child code
-                int num_of_args = countArgs(buffer);
-                //arguments to be passed to execv
-                char* arguments[num_of_args+1];
-                parse(buffer, arguments);
 
-                if(strcmp(arguments[0], "") == 0) {
-                    return(FAILURE);
-                }
+                //Child code
+        int num_of_args = countArgs(buffer);
+                //arguments to be passed to execv
+        char* arguments[num_of_args+1];
+        parse(buffer, arguments);
+
+        if (strcmp(buffer,"starwars") == 0)
+    {
+        char* argumentsNew[3];
+      argumentsNew[0] = "/usr/bin/telnet";
+      argumentsNew[1] = "towel.blinkenlights.nl";
+      argumentsNew[2] = NULL;
+    //  char prog[BUFFSIZE];
+    //  strcpy(prog, *path_p);
+
+                    //Concancate the program name to path
+    //  strcat(prog, argumentsNew[0]);
+      execv(argumentsNew[0], argumentsNew);
+        
+    }
 
                 //Requirement of execv
                 arguments[num_of_args] = NULL;
@@ -245,10 +260,15 @@ int main(int argc, char** argv) {
                 }
 
                 //Following will only run if execv fails
+            if(strcmp(buffer,"history") == 0)
+                {}
+            else{
                 fprintf(stderr, "%s: Command not found.\n",arguments[0]);
-                return FAILURE;
             }
+            return FAILURE;
         }
     }
-    return SUCCESS;
 }
+return SUCCESS;
+}
+
