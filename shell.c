@@ -221,6 +221,64 @@ void check_piping(char** arguments) {
     }
 }
 
+void processDeleteCmd(char *secondCmd)
+{
+   // Remove the file
+   if ( remove(secondCmd) < 0 )
+   {
+      printf("Unable to remove file\n");
+      return;
+   }
+   else
+   {
+	printf("File successfully deleted.\n");
+	return;
+   }
+}
+
+void cowsay(char** arguments)
+{
+	char** args = arguments;
+	char* cow[] = {"     \\   ^__^                 ",                
+               "      \\  (OO)\\__________    ",
+               "         (__)\\          )\\/\\",
+               "              | |SHELL| |  ",
+               "              | | ers | |   "};
+	
+	int numberOfChars = 0;
+	int numArgs = 0;
+	int i;
+	while(*args)
+	{   
+	    numberOfChars = strlen(*args) + numberOfChars;
+	    args++;
+	    numArgs++;
+	}
+       	numberOfChars = numberOfChars-3;
+	args = arguments;
+	for(i = 0; i < numberOfChars + 4; i++)
+	{
+		printf("_");
+	}
+	printf("\n<  ");
+	for(i = 1; i < numArgs; i++)
+	{
+		printf("%s ", args[i]);
+	}
+	printf("  >\n");
+	for(i = 0; i < numberOfChars + 4; i++)
+	{
+		printf("_");
+	}
+	printf("\n");
+	for(i = 0; i<5; i++)
+	{
+		printf("%s\n", cow[i]);
+	}
+	return;
+}
+
+
 
 int main(int argc, char** argv) {
 
@@ -269,6 +327,20 @@ int main(int argc, char** argv) {
                 printf("History command  %d: %s\n", n, history[n]);
             }
         }
+        
+        int numArgs = countArgs(buffer);
+	char* args[numArgs+1];
+        parse(buffer, args);
+	args[numArgs] = NULL;
+	if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
+   		{
+     		 	processDeleteCmd(args[1]);
+   		}
+	if ( strcmp(args[0], "holycow") == 0)
+	{
+		cowsay(args);
+	}
+
 
 
         if(!check_builtins(bfunc, buffer, bfunc_size)) {
@@ -322,6 +394,10 @@ int main(int argc, char** argv) {
 
                 if(strcmp(arguments[0], "history") == 0)
                 {}
+                else if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
+		{}
+	    	else if ( strcmp(args[0], "holycow") == 0 )
+		{}
                 else {
                     //Following will only run if execv fails
                     fprintf(stderr, "%s: Command not found.\n",arguments[0]);
