@@ -131,6 +131,19 @@ bool valid_filename(char* filename) {
     return true;
 }
 
+void processDeleteCmd(char *secondCmd)
+{
+   if ( remove(secondCmd) < 0 )
+   {
+      printf("Unable to remove file\n");
+      return;
+   }
+   else
+   {
+    printf("File successfully deleted.\n");
+    return;
+   }
+
 void check_redirection(char** arguments) {
     char** arg = arguments;
 
@@ -178,20 +191,9 @@ void check_redirection(char** arguments) {
         }
         arg++;
     }
-}
-void processDeleteCmd(char *secondCmd)
-{
-   if ( remove(secondCmd) < 0 )
-   {
-      printf("Unable to remove file\n");
-      return;
-   }
-   else
-   {
-	printf("File successfully deleted.\n");
-	return;
-   }
-}
+
+
+
 
 int main(int argc, char** argv) {
 
@@ -236,6 +238,9 @@ int numArgs = countArgs(buffer);
    		{
      		 	processDeleteCmd(args[1]);
    		}
+        else {
+            printf("myShell&gt: ");
+        }
 
         fgets(buffer, BUFFSIZE, stdin);
         if(!check_builtins(bfunc, buffer, bfunc_size)) {
