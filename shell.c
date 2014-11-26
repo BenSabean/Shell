@@ -143,6 +143,7 @@ void processDeleteCmd(char *secondCmd)
     printf("File successfully deleted.\n");
     return;
    }
+}
 
 void check_redirection(char** arguments) {
     char** arg = arguments;
@@ -191,6 +192,7 @@ void check_redirection(char** arguments) {
         }
         arg++;
     }
+}
 
 void cowsay(char** arguments)
 {	//pointer to the arguments
@@ -235,6 +237,43 @@ void cowsay(char** arguments)
 	return;
 }
 
+void run_pipe(char* arg[]) {
+    int pfds[2];
+    pipe(pfds);
+    if(!fork()) {
+        //child code
+        close(1);       /* close normal stdout */
+        dup(pfds[1]);   /* make stdout same as pfds[1] */
+        close(pfds[0]); /* we don't need this */
+        execlp(arg[0], arg[0], NULL);
+
+        //only runs if exec fails
+        fprintf(stderr, "%s: Command not found.\n",arg[0]);
+        return;
+    }
+    else {
+        close(0);       /* close normal stdin */
+        dup(pfds[0]);   /* make stdin same as pfds[0] */
+        close(pfds[1]); /* we don't need this */
+        execlp(arg[2], arg[2], NULL);
+
+        //only runs if exec fails
+        fprintf(stderr, "%s: Command not found.\n",arg[2]);
+        return;
+    }
+}
+
+void check_piping(char** arguments) {
+    char** arg = arguments;   //point to first element of array
+
+    while(*arg) {
+        if (strcmp(*arg, "|") == 0) {
+            run_pipe(arguments);
+            return;
+        }
+        arg++;
+    }
+}
 
 
 int main(int argc, char** argv) {
@@ -335,6 +374,7 @@ int numArgs = countArgs(buffer);
 
                 //Requirement of execv
                 arguments[num_of_args] = NULL;
+                check_piping(arguments);
                 check_redirection(arguments);
 
                 char prog[BUFFSIZE];
