@@ -261,12 +261,25 @@ int main(int argc, char** argv) {
            getcwd(cwd, BUFFSIZE) != NULL) {
             printf("%s@%s:~%s$ ", username, ubuffer.nodename, cwd);
         }
+        else {
+            printf("myShell&gt: ");
+        }
+  fgets(buffer, BUFFSIZE, stdin);
+    if (history_count < 11) {
+        history[history_count++] = strdup(buffer);
+    } else {
+        free( history[0] );
+	unsigned index = 1;
+        for (; index < 11; index++) {
+            history[index - 1] = history[index];
+        }
         history[11 - 1] = strdup(buffer);
     }
 
     if (strcmp(buffer,"history\n") == 0)
     {
-      for (int n = 1; n < 10; n++) {
+	int n;
+      for (n = 1; n < 10; n++) {
         printf("History command  %d: %s\n", n, history[n]);
         
     }
@@ -281,11 +294,12 @@ int numArgs = countArgs(buffer);
    		{
      		 	processDeleteCmd(args[1]);
    		}
-        else {
-            printf("myShell&gt: ");
-        }
+   	else if ( strcmp(args[0], "holycow") == 0)
+	{
+		cowsay(args);
+	}
+        
 
-        fgets(buffer, BUFFSIZE, stdin);
         if(!check_builtins(bfunc, buffer, bfunc_size)) {
             int pid = fork();
 
@@ -342,6 +356,8 @@ int numArgs = countArgs(buffer);
             //Make sure it skips the command not found
              else if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
 		    {}
+	     else if ( strcmp(args[0], "holycow") == 0 )
+		{}
             else{
                 fprintf(stderr, "%s: Command not found.\n",arguments[0]);
             }
