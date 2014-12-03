@@ -1,6 +1,3 @@
-/*
-	Based on code from http://dumbified.wordpress.com/2010/04/25/how-to-write-a-shell-in-c-using-fork-and-execv/
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +7,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/utsname.h>
-#include <readline/history.h>
+//#include <readline/history.h>
 
 #define BUFFSIZE 512
 #define DEBUG false
@@ -315,7 +312,7 @@ int main(int argc, char** argv) {
             history[history_count++] = strdup(buffer);
         }
         else {
-            free( history[0] );
+            //free( history[0] );
             for (index = 1; index < 11; index++) {
                 history[index - 1] = history[index];
                 history[11 - 1] = strdup(buffer);
