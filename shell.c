@@ -16,10 +16,11 @@
 #define UNIVERSAL_ZERO { 0 }
 #define MAX_LENGTH 50
 #define ARG_LENGTH 50
-#define HISTORY_SIZE 100
+#define HISTORY_SIZE 11
 
-static const char *history[11];
-static  unsigned history_count = 0;
+static const char *history[HISTORY_SIZE];
+static unsigned history_count = 0;
+
 //struct for built-in shell functions
 struct builtin {
     const char* label;
@@ -232,7 +233,7 @@ void processDeleteCmd(char *secondCmd)
    }
 }
 
-void cowsay(char** arguments)
+void holycow(char** arguments)
 {
 	char** args = arguments;
 	char* cow[] = {"     \\   ^__^                 ",                
@@ -294,12 +295,21 @@ void starwars() {
     }
 }
 
+void display_history() {
+    int n;
+    for (n = 1; n < HISTORY_SIZE; n++) {
+        printf("History command  %d: %s\n", n, history[n]);
+    }
+}
+
 
 int main(int argc, char** argv) {
 
     struct builtin bfunc[] = {
         {.label = "exit", .op = &close_shell},
         {.label = "cd", .op = &cd},
+        {.label = "history", .op = &display_history},
+        {.label = "holycow", .op = &holycow},
         {.label = "starwars", .op = &starwars}
     };
     int bfunc_size = (int) (sizeof(bfunc)/sizeof(bfunc[0]));
@@ -327,20 +337,13 @@ int main(int argc, char** argv) {
         }
 
         fgets(buffer, BUFFSIZE, stdin);
-        if (history_count < 11) {
+        if (history_count < HISTORY_SIZE) {
             history[history_count++] = strdup(buffer);
         }
         else {
-            for (index = 1; index < 11; index++) {
+            for(index = 1; index < HISTORY_SIZE; index++) {
                 history[index - 1] = history[index];
-                history[11 - 1] = strdup(buffer);
-            }
-        }
-
-        if(strcmp(buffer, "history\n") == 0) {
-            int n;
-            for (n = 1; n < 10; n++) {
-                printf("History command  %d: %s\n", n, history[n]);
+                history[HISTORY_SIZE - 1] = strdup(buffer);
             }
         }
         
@@ -350,15 +353,9 @@ int main(int argc, char** argv) {
         parse(bufferTwo, args);
 	args[numArgs] = NULL;
 	if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
-   		{
+        {
      		 	processDeleteCmd(args[1]);
-   		}
-	if ( strcmp(args[0], "holycow") == 0)
-	{
-		cowsay(args);
-	}
-
-
+        }
 
         if(!check_builtins(bfunc, buffer, bfunc_size)) {
             int pid = fork();
@@ -399,11 +396,7 @@ int main(int argc, char** argv) {
                     path_p++;   //program not found. Try another path
                 }
 
-                if(strcmp(arguments[0], "history") == 0)
-                {}
-                else if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
-		{}
-	    	else if ( strcmp(args[0], "holycow") == 0 )
+                if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
 		{}
                 else {
                     //Following will only run if execv fails
