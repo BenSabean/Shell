@@ -7,7 +7,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/utsname.h>
-//#include <readline/history.h>
 
 #define BUFFSIZE 512
 #define DEBUG false
@@ -275,13 +274,33 @@ void cowsay(char** arguments)
 	return;
 }
 
+void starwars() {
+
+    int pid = fork();
+  
+    if(pid < 0) {
+        fprintf(stderr, "Unable to fork new process.\n");
+    }
+    if(pid > 0) {
+        wait(NULL);
+    }
+    if(pid ==0) {
+        char* argumentsNew[3];
+        argumentsNew[0] = "/usr/bin/telnet";
+        argumentsNew[1] = "towel.blinkenlights.nl";
+        argumentsNew[2] = NULL;
+
+        execv(argumentsNew[0], argumentsNew);
+    }
+}
 
 
 int main(int argc, char** argv) {
 
     struct builtin bfunc[] = {
         {.label = "exit", .op = &close_shell},
-        {.label = "cd", .op = &cd}
+        {.label = "cd", .op = &cd},
+        {.label = "starwars", .op = &starwars}
     };
     int bfunc_size = (int) (sizeof(bfunc)/sizeof(bfunc[0]));
 
@@ -312,7 +331,6 @@ int main(int argc, char** argv) {
             history[history_count++] = strdup(buffer);
         }
         else {
-            //free( history[0] );
             for (index = 1; index < 11; index++) {
                 history[index - 1] = history[index];
                 history[11 - 1] = strdup(buffer);
@@ -358,16 +376,6 @@ int main(int argc, char** argv) {
                 //arguments to be passed to execv
                 char* arguments[num_of_args+1];
                 parse(buffer, arguments);
-
-                if (strcmp(buffer,"starwars") == 0)
-                {
-                    char* argumentsNew[3];
-                    argumentsNew[0] = "/usr/bin/telnet";
-                    argumentsNew[1] = "towel.blinkenlights.nl";
-                    argumentsNew[2] = NULL;
-
-                    execv(argumentsNew[0], argumentsNew);
-                }
 
                 if(strcmp(arguments[0], "") == 0) {
                     return(FAILURE);
