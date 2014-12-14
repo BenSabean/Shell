@@ -218,61 +218,62 @@ void check_piping(char** arguments) {
     }
 }
 
-void processDeleteCmd(char *secondCmd)
+void delete(char** arg)
 {
-   // Remove the file
-   if ( remove(secondCmd) < 0 )
-   {
-      printf("Unable to remove file\n");
-      return;
-   }
-   else
-   {
-	printf("File successfully deleted.\n");
-	return;
-   }
+    if(arg[1] != NULL) {
+        // Remove the file
+        if ( remove(arg[1]) < 0 ) {
+           printf("Unable to remove file\n");
+        }
+        else {
+            printf("File successfully deleted.\n");
+        }
+    }
+    else {
+        fprintf(stderr, "Invalid usage of delete command.\n");
+    }
 }
 
 void holycow(char** arguments)
 {
-	char** args = arguments;
-	char* cow[] = {"     \\   ^__^                 ",                
-               "      \\  (OO)\\__________    ",
-               "         (__)\\          )\\/\\",
-               "              | |SHELL| |  ",
-               "              | | ers | |   "};
+    char** args = arguments;
+    char* cow[] = {"     \\   ^__^                 ",                
+                   "      \\  (OO)\\__________    ",
+                   "         (__)\\          )\\/\\",
+                   "              | |SHELL| |  ",
+                   "              | | ers | |   "};
 	
-	int numberOfChars = 0;
-	int numArgs = 0;
-	int i;
-	while(*args)
-	{   
-	    numberOfChars = strlen(*args) + numberOfChars;
-	    args++;
-	    numArgs++;
-	}
-       	numberOfChars = numberOfChars-3;
-	args = arguments;
-	for(i = 0; i < numberOfChars + 4; i++)
-	{
-		printf("_");
-	}
-	printf("\n<  ");
-	for(i = 1; i < numArgs; i++)
-	{
-		printf("%s ", args[i]);
-	}
-	printf("  >\n");
-	for(i = 0; i < numberOfChars + 4; i++)
-	{
-		printf("_");
-	}
-	printf("\n");
-	for(i = 0; i<5; i++)
-	{
-		printf("%s\n", cow[i]);
-	}
-	return;
+    int numberOfChars = 0;
+    int numArgs = 0;
+    int i;
+    while(*args)
+    {   
+        numberOfChars = strlen(*args) + numberOfChars;
+        args++;
+        numArgs++;
+    }
+    numberOfChars = numberOfChars-3;
+    args = arguments;
+    for(i = 0; i < numberOfChars + 4; i++)
+    {
+        printf("_");
+    }
+    printf("\n<  ");
+    for(i = 1; i < numArgs; i++)
+    {
+        printf("%s ", args[i]);
+    }
+    printf("  >\n");
+    for(i = 0; i < numberOfChars + 4; i++)
+    {
+        printf("_");
+    }
+    printf("\n");
+    for(i = 0; i<5; i++)
+    {
+        printf("%s\n", cow[i]);
+    }
+    return;
 }
 
 void starwars() {
@@ -310,6 +311,7 @@ int main(int argc, char** argv) {
         {.label = "cd", .op = &cd},
         {.label = "history", .op = &display_history},
         {.label = "holycow", .op = &holycow},
+        {.label = "delete", .op = &delete},
         {.label = "starwars", .op = &starwars}
     };
     int bfunc_size = (int) (sizeof(bfunc)/sizeof(bfunc[0]));
@@ -352,10 +354,6 @@ int main(int argc, char** argv) {
 	strncpy(bufferTwo, buffer,BUFFSIZE);
         parse(bufferTwo, args);
 	args[numArgs] = NULL;
-	if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
-        {
-     		 	processDeleteCmd(args[1]);
-        }
 
         if(!check_builtins(bfunc, buffer, bfunc_size)) {
             int pid = fork();
@@ -396,12 +394,8 @@ int main(int argc, char** argv) {
                     path_p++;   //program not found. Try another path
                 }
 
-                if ( strcmp(args[0], "delete") == 0 && numArgs == 2)
-		{}
-                else {
-                    //Following will only run if execv fails
-                    fprintf(stderr, "%s: Command not found.\n",arguments[0]);
-                }
+               //Following will only run if execv fails
+               fprintf(stderr, "%s: Command not found.\n",arguments[0]);
                return FAILURE;
             }
         }
